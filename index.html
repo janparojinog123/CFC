@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CFC Quick Post</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --surface2: #1e1e2a;
+    --border: #2a2a3a;
+    --accent: #c9a96e;
+    --accent2: #e8c99a;
+    --text: #f0ece4;
+    --muted: #8a8595;
+    --chip-bg: #1e1e2a;
+    --chip-active: #c9a96e;
+    --chip-active-text: #0d0d14;
+    --moon: #c9a96e;
+    --green: #6ec99a;
+    --tweet-bg: #000;
+    --tweet-border: #333;
+    --tweet-hover-bg: #1a1a1a;
+    --tweet-hover-border: #555;
+  }
+
+  :root.light {
+    --bg: #faf7f2;
+    --surface: #ffffff;
+    --surface2: #f3efe8;
+    --border: #e2d9cc;
+    --accent: #a87840;
+    --accent2: #c49454;
+    --text: #1a1510;
+    --muted: #9a8d7e;
+    --chip-bg: #f3efe8;
+    --chip-active: #a87840;
+    --chip-active-text: #ffffff;
+    --moon: #a87840;
+    --green: #3a9a6a;
+    --tweet-bg: #1a1a1a;
+    --tweet-border: #444;
+    --tweet-hover-bg: #000;
+    --tweet-hover-border: #222;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body, header, .section, .post-card, .post-card-header,
+  input[type="text"], textarea, select, footer, .chip, .hashtag-pill,
+  .copy-btn, .output-header-bar {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(201,169,110,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(201,169,110,0.05) 0%, transparent 50%);
+    transition: background-color 0.3s ease;
+  }
+
+  :root.light body {
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(168,120,64,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(168,120,64,0.04) 0%, transparent 50%);
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% -30%, rgba(201,169,110,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .version-badge {
+    display: inline-block;
+    margin-top: 0.75rem;
+    background: var(--border);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  main {
+    flex: 1;
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  :root.light .section {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .section:nth-child(1) { animation-delay: 0.05s; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.2s; }
+  .section:nth-child(5) { animation-delay: 0.25s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .chip {
+    background: var(--chip-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.4rem 0.875rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-weight: 400;
+    user-select: none;
+  }
+
+  .chip:hover { border-color: var(--accent); color: var(--accent2); }
+  .chip.active {
+    background: var(--chip-active);
+    border-color: var(--chip-active);
+    color: var(--chip-active-text);
+    font-weight: 600;
+  }
+
+  label.field-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .helper {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    outline: none;
+    transition: border-color 0.18s;
+    resize: vertical;
+  }
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238a8595' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+    resize: none;
+  }
+
+  select option { background: #16161f; color: var(--text); }
+
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder, textarea::placeholder { color: var(--muted); }
+
+  .char-count {
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+  .char-count.warn { color: #e88c6e; }
+
+  .hashtag-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .hashtag-pill {
+    background: rgba(201,169,110,0.1);
+    border: 1px solid rgba(201,169,110,0.25);
+    color: var(--accent2);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  .generate-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #0d0d14;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .generate-btn:hover::before { transform: translateX(100%); }
+  .generate-btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,169,110,0.25); }
+  .generate-btn:active { transform: translateY(0); }
+
+  /* ── Output area ── */
+  #outputArea {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  #outputArea.visible { display: flex; animation: fadeUp 0.4s ease both; }
+
+  .output-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .output-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .variation-count {
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+
+  /* Individual post card */
+  .post-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  :root.light .post-card {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .post-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-card-num {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .post-card-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    padding: 0.28rem 0.7rem;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+  .tweet-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--tweet-bg);
+    border: 1px solid var(--tweet-border);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.28rem 0.7rem;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .tweet-btn:hover {
+    background: var(--tweet-hover-bg);
+    border-color: var(--tweet-hover-border);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  }
+
+  .tweet-btn svg {
+    width: 11px;
+    height: 11px;
+    fill: #fff;
+    flex-shrink: 0;
+  }
+
+  .post-card-body {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text);
+  }
+
+  .post-link {
+    color: var(--accent);
+  }
+
+  footer {
+    text-align: center;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .theme-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    background: var(--chip-bg);
+    transform: rotate(15deg) scale(1.1);
+  }
+
+  .moon { color: var(--moon); }
+
+  @media (max-width: 500px) {
+    .section { padding: 1.25rem; }
+    main { padding: 1.25rem 1rem; gap: 1.25rem; }
+    .post-card-body { font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">Fan-made utility tool</div>
+  <h1>CFC <span>Quick Post</span></h1>
+  <div class="version-badge">Version 1</div>
+</header>
+
+<main>
+
+  <!-- Topic -->
+  <div class="section">
+    <div class="section-label">Choose your topic</div>
+    <div class="chips" id="topicChips">
+      <button class="chip" data-topic="welcomeBack">Welcoming Everyone Back</button>
+      <button class="chip" data-topic="countdown">Countdown to new episode</button>
+      <button class="chip" data-topic="visualMoments">Visual Moments</button>
+      <button class="chip" data-topic="globalSupport1">Global support (1)</button>
+      <button class="chip" data-topic="chemistry1">FirstKhaotung peak chemistry (1)</button>
+      <button class="chip" data-topic="praisingVisuals">Praising FirstKhaotung visuals</button>
+      <button class="chip" data-topic="emotional">Emotional Performances That Speak</button>
+      <button class="chip" data-topic="chemistry2">FirstKhaotung peak chemistry (2)</button>
+      <button class="chip" data-topic="globalSupport2">Global support (2)</button>
+      <button class="chip" data-topic="atmosphere">Atmosphere & impact</button>
+      <button class="chip" data-topic="tigerLynx">Focus on TigerLynx</button>
+    </div>
+  </div>
+
+  <!-- Custom text -->
+  <div class="section">
+    <label class="field-label" for="customText">Add your number / text / symbol <span style="color:var(--accent)">(required, max 10 characters)</span></label>
+    <input type="text" id="customText" maxlength="10" placeholder="e.g. 2026, ✨, #1...">
+    <div class="char-count" id="charCount">0 / 10</div>
+  </div>
+
+  <!-- Additional hashtags -->
+  <div class="section">
+    <label class="field-label" for="additionalHashtags">Additional hashtags</label>
+    <textarea id="additionalHashtags" rows="3" placeholder="#YourHashtag #AnotherOne"></textarea>
+    <div class="helper">Please don't add too many — recommended next day</div>
+  </div>
+
+  <!-- Pre-set hashtags -->
+  <div class="section">
+    <div class="section-label">Pre-set hashtags</div>
+    <div class="hashtag-pills">
+      <span class="hashtag-pill">#CatForCash</span>
+      <span class="hashtag-pill">#FirstKhaotung</span>
+      <span class="hashtag-pill">#เฟิร์สข้าวตัง</span>
+      <span class="hashtag-pill">#FirstKanaphan</span>
+      <span class="hashtag-pill">#khaotungg</span>
+    </div>
+    <div class="helper" style="margin-top:0.75rem">These are always included in your post.</div>
+  </div>
+
+  <!-- Link selection -->
+  <div class="section">
+    <div class="section-label">Do you want to share a link?</div>
+    <select id="linkSelect">
+      <option value="no">No</option>
+      <option value="trailer">Cat For Cash Trailer</option>
+      <option value="mv">Found My Home MV</option>
+    </select>
+  </div>
+
+  <!-- Generate -->
+  <button class="generate-btn" id="generateBtn">✦ Generate Post</button>
+
+  <!-- Output -->
+  <div id="outputArea">
+    <div class="output-header-bar">
+      <span class="output-title">Generated posts</span>
+      <span class="variation-count" id="variationCount"></span>
+    </div>
+    <div id="cardsContainer"></div>
+  </div>
+
+</main>
+
+<footer>
+  <span>CFC Tool • Fan Made</span>
+  <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
+</footer>
+
+<script>
+  const PRESET_HASHTAGS = '#CatForCash #FirstKhaotung #เฟิร์สข้าวตัง #FirstKanaphan #khaotungg';
+
+  const LINKS = {
+    no: '',
+    trailer: 'https://www.youtube.com/watch?v=H6l2SWc3SLI',
+    mv: 'https://www.youtube.com/watch?v=H6l2SWc3SLI'
+  };
+
+  // 4 variation templates per topic. {c} = user custom text
+  const TOPIC_VARIATIONS = {
+    welcomeBack: [
+      "Welcome back everyone! So glad we're all gathered here again {c} 🌟",
+      "The fandom is back and better than ever {c} 💛",
+      "Here we go — welcoming every single fan back {c} 🥳",
+      "Hello hello! Everyone come together {c} 🌙"
+    ],
+    countdown: [
+      "Only {c} left until the new episode — can't wait! ⏳",
+      "Counting down: {c} to go! Are you ready? 🔥",
+      "The wait is almost over. {c} more and we're there ✨",
+      "{c} remaining and the excitement is absolutely real 💫"
+    ],
+    visualMoments: [
+      "These visual moments are everything {c} 📸",
+      "Capturing the sheer beauty of this series {c} 🎬",
+      "Every single frame is a work of art {c} ✨",
+      "Visual storytelling at its absolute finest {c} 🌟"
+    ],
+    globalSupport1: [
+      "Global fans rising up — sending love from everywhere {c} 🌍",
+      "The whole world is watching and cheering {c} 💙",
+      "From every corner of the globe, we support them {c} 🌏",
+      "International fans coming together as one {c} 🌎"
+    ],
+    chemistry1: [
+      "FirstKhaotung chemistry is completely off the charts {c} 🔥",
+      "The way they look at each other... {c} 💞",
+      "No one does it quite like First and Khaotung {c} ✨",
+      "Their connection is electric and undeniable {c} 🌟"
+    ],
+    praisingVisuals: [
+      "First and Khaotung are breathtakingly beautiful {c} ✨",
+      "Their visuals deserve every single award {c} 😍",
+      "Absolutely stunning — there truly are no words {c} 💫",
+      "Praising their visuals all day every day {c} 🌹"
+    ],
+    emotional: [
+      "Their performances hit so much deeper than expected {c} 💔",
+      "Every scene makes me feel absolutely everything {c} 🥹",
+      "Emotional depth that speaks without a single word {c} 💫",
+      "The way they portray emotion is completely unmatched {c} 🌊"
+    ],
+    chemistry2: [
+      "Still not over that chemistry — wow {c} 🔥",
+      "FirstKhaotung never miss, never disappoint {c} 💕",
+      "Peak chemistry unlocked once again {c} ✨",
+      "They were truly made for these roles {c} 🌟"
+    ],
+    globalSupport2: [
+      "The global fandom always shows up — no matter what {c} 🌍",
+      "Worldwide support simply cannot be stopped {c} 💪",
+      "Every timezone is cheering loud and proud {c} 🌏",
+      "From all around the world — we see you, we hear you {c} 🌎"
+    ],
+    atmosphere: [
+      "The atmosphere this series creates is completely unreal {c} 🌙",
+      "Every single episode leaves such a lasting impact {c} 💫",
+      "The mood, the vibe, the feeling — indescribable {c} ✨",
+      "This show hits different with every single watch {c} 🔮"
+    ],
+    tigerLynx: [
+      "TigerLynx nation, this is absolutely our moment {c} 🐯",
+      "Focusing on TigerLynx because they deserve all the love {c} 🌟",
+      "Tiger and Lynx have my whole entire heart {c} 💛",
+      "TigerLynx dynamics are simply everything {c} 🐾"
+    ]
+  };
+
+  // Default variations when no topic selected
+  const DEFAULT_VARIATIONS = [
+    "Cat For Cash — showing up every day {c} ✨",
+    "Sharing this moment with everyone {c} 💛",
+    "Don't miss out on this {c} 🔥",
+    "CFC fandom, let's go together {c} 🌙"
+  ];
+
+  let selectedTopic = '';
+
+  // Chips
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedTopic = chip.dataset.topic;
+    });
+  });
+
+  // Char counter
+  const customText = document.getElementById('customText');
+  const charCount = document.getElementById('charCount');
+  customText.addEventListener('input', () => {
+    const len = customText.value.length;
+    charCount.textContent = `${len} / 10`;
+    charCount.classList.toggle('warn', len >= 9);
+  });
+
+  // Generate
+  document.getElementById('generateBtn').addEventListener('click', () => {
+    const custom = customText.value.trim();
+
+    if (!custom) {
+      customText.focus();
+      customText.style.borderColor = '#e88c6e';
+      setTimeout(() => customText.style.borderColor = '', 1500);
+      return;
+    }
+
+    const additionalHashtags = document.getElementById('additionalHashtags').value.trim();
+    const linkKey = document.getElementById('linkSelect').value;
+    const linkUrl = LINKS[linkKey];
+
+    const templates = (selectedTopic && TOPIC_VARIATIONS[selectedTopic])
+      ? TOPIC_VARIATIONS[selectedTopic]
+      : DEFAULT_VARIATIONS;
+
+    const container = document.getElementById('cardsContainer');
+    container.innerHTML = '';
+
+    // Store post texts for copy
+    const postTexts = [];
+
+    templates.forEach((template, i) => {
+      const mainLine = template.replace('{c}', custom);
+
+      const lines = [mainLine, '', PRESET_HASHTAGS];
+      if (additionalHashtags) lines.push(additionalHashtags);
+      if (linkUrl) lines.push(linkUrl);
+
+      const postText = lines.join('\n').trim();
+      postTexts.push(postText);
+
+      const tweetUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(postText);
+
+      const card = document.createElement('div');
+      card.className = 'post-card';
+      card.style.animationDelay = (i * 0.08) + 's';
+
+      card.innerHTML = `
+        <div class="post-card-header">
+          <span class="post-card-num">Variation ${i + 1}</span>
+          <div class="post-card-actions">
+            <button class="copy-btn" data-idx="${i}">Copy</button>
+            <a class="tweet-btn" href="${tweetUrl}" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.892-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Post to X
+            </a>
+          </div>
+        </div>
+        <div class="post-card-body">${renderPostBody(postText)}</div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    // Wire copy buttons
+    container.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        navigator.clipboard.writeText(postTexts[idx]).then(() => {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+      });
+    });
+
+    document.getElementById('variationCount').textContent = `${templates.length} variations`;
+
+    const outputArea = document.getElementById('outputArea');
+    outputArea.classList.add('visible');
+    outputArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  function renderPostBody(text) {
+    // Escape HTML then highlight URLs
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return escaped.replace(
+      /(https?:\/\/[^\s]+)/g,
+      '<span class="post-link">$1</span>'
+    );
+  }
+
+  // ── Theme toggle ──
+  const toggle = document.getElementById('themeToggle');
+  let isLight = false;
+
+  toggle.addEventListener('click', () => {
+    isLight = !isLight;
+    document.documentElement.classList.toggle('light', isLight);
+    toggle.textContent = isLight ? '☀️' : '🌙';
+    toggle.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+    // Bounce animation
+    toggle.style.transform = 'rotate(360deg) scale(1.2)';
+    setTimeout(() => toggle.style.transform = '', 300);
+  });
+</script>
+</body>
+</html>
